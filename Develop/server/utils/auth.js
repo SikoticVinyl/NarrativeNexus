@@ -1,39 +1,37 @@
 const jwt = require('jsonwebtoken');
 
-// set token secret and expiration date
+// Set token secret and expiration date
 const secret = 'mysecretsshhhhh';
 const expiration = '2h';
 
 module.exports = {
-  // function for our authenticated routes
-  authMiddleware: function (req, res, next) {
-    // allows token to be sent via  req.query or headers
-    let token = req.query.token || req.headers.authorization;
+  // Function to be used as middleware in Apollo Server
+  authMiddleware: function ({ req }) {
+    // Allows token to be sent via req.query or headers
+    let token = req.query?.token || req.headers?.authorization;
 
-    // ["Bearer", "<tokenvalue>"]
+    // Extract token if it comes as "Bearer <tokenvalue>"
     if (req.headers.authorization) {
       token = token.split(' ').pop().trim();
     }
 
-    if (!token) {
-      return res.status(400).json({ message: 'You have no token!' });
+    // Add user to the context if token is valid
+    if (token) {
+      try {
+        // Verify token and get user data out of it
+        const { data } = jwt.verify(token, secret, { maxAge: expiration });
+        req.user = data;
+      } catch {
+        console.log('Invalid token');
+      }
     }
 
-    // verify token and get user data out of it
-    try {
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
-      req.user = data;
-    } catch {
-      console.log('Invalid token');
-      return res.status(400).json({ message: 'invalid token!' });
-    }
-
-    // send to next endpoint
-    next();
+    // Return the request object so it can be added to the context
+    return req;
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
-
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
   },
 };
+
