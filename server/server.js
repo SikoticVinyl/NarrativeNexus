@@ -1,18 +1,26 @@
+require('dotenv').config();
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const path = require('path');
 const db = require('./config/connection');
-const { typeDefs } = require('./graphql/schemas/typeDefs');
-const { resolvers } = require('./graphql/schemas/resolvers');
+const { typeDefs, resolvers } = require('./graphql/schemas/index');
 const { authMiddleware } = require('./utils/auth');
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+console.log('typeDefs:', typeDefs);
+console.log('resolvers:', resolvers);
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => authMiddleware({ req }),
+  formatError: (error) => {
+    console.log('GraphQL Error:', error);
+    return error;
+  },
 });
 
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +42,7 @@ async function startServer() {
 startServer();
 
 db.once('open', () => {
+  console.log('Connected to MongoDB successfully');
   app.listen(PORT, () => {
     console.log(`🌍 Now listening on localhost:${PORT}`);
     console.log(`🚀 GraphQL API ready at http://localhost:${PORT}${server.graphqlPath}`);
