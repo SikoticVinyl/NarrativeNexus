@@ -1,0 +1,21 @@
+# Dependency directories
+node_modules/
+
+# Environment configuration files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.vscode/
+
+# Build output directories
+/dist
+/build
+/.cache
+/coverage
+
+# Dependency lock files
+package-lock.json
