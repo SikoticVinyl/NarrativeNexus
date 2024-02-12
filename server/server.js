@@ -2,15 +2,17 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const path = require('path');
 const db = require('./config/connection');
-const { } = require('./schemas'); //not yet created
+const { typeDefs } = require('./graphql/schemas/typeDefs');
+const { resolvers } = require('./graphql/schemas/resolvers');
 const { authMiddleware } = require('./utils/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const server = new ApolloServer({
-  //schemas here
-  context: authMiddleware,
+  typeDefs,
+  resolvers,
+  context: ({ req }) => authMiddleware({ req }),
 });
 
 app.use(express.urlencoded({ extended: true }));
