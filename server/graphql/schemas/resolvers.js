@@ -1,5 +1,5 @@
-const { User } = require('../models');
-const { signToken } = require('../utils/auth');
+const { User } = require('../../models/index');
+const { signToken } = require('../../utils/auth');
 
 const resolvers = {
   Query: {
@@ -25,17 +25,24 @@ const resolvers = {
     },
 
     // Resolver for logging in a user
-    login: async (_, { email, password }) => {
-      const user = await User.findOne({ email });
+    login: async (_, { loginInput, password }) => {
+      // Determine if loginInput is an email or username based on the presence of an '@'
+      const isEmail = loginInput.includes('@');
+      
+      // Construct the query condition based on the input type
+      const condition = isEmail ? { email: loginInput } : { username: loginInput };
+      
+      // Find the user by email or username
+      const user = await User.findOne(condition);
       if (!user) {
         throw new Error("Can't find this user");
       }
-
+    
       const correctPw = await user.isCorrectPassword(password);
       if (!correctPw) {
         throw new Error('Wrong password');
       }
-
+    
       const token = signToken(user);
       return { token, user };
     },
