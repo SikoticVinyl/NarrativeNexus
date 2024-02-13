@@ -1,10 +1,5 @@
 import React from 'react';
-import { 
-  ApolloClient, 
-  InMemoryCache, 
-  ApolloProvider, 
-  createHttpLink 
-} from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -13,7 +8,8 @@ import Auth from './utils/auth';
 
 // Create an HTTP link that connects to the GraphQL endpoint
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_ENDPOINT,
+  // Use VITE_ prefix for Vite projects to access environment variables
+  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT,
 });
 
 // Create a context link that adds the token to the headers of each request
@@ -25,7 +21,7 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       authorization: token ? `Bearer ${token}` : "",
-    }
+    },
   };
 });
 
@@ -47,4 +43,3 @@ function App() {
 }
 
 export default App;
-
