@@ -1,3 +1,4 @@
+require('dotenv').config();
 import React from 'react';
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
@@ -9,7 +10,7 @@ import Auth from './utils/auth';
 // Create an HTTP link that connects to the GraphQL endpoint
 const httpLink = createHttpLink({
   // Use VITE_ prefix for Vite projects to access environment variables
-  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT,
+  uri:process.env.MONGODB_URI,
 });
 
 // Create a context link that adds the token to the headers of each request
